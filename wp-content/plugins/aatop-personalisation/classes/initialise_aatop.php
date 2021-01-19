@@ -20,16 +20,19 @@ class AatopInit
             email_optin varchar(255),
             email_paused_at varchar(255),
             email_paused_period varchar(255),
-            PRIMARY KEY id (id)
+            PRIMARY KEY id (id),
+            UNIQUE (identified)
         ) $charset_collate;";
 
         $table_visitors = $wpdb->prefix . 'aatop_visitors';
         $sql_visitor = "CREATE TABLE $table_visitors (
             id int(9) NOT NULL AUTO_INCREMENT,
-            type enum('vacature','search') DEFAULT 'search' NOT NULL,
             session_id varchar(255) NOT NULL,
+            type enum('vacature','search') DEFAULT 'search' NOT NULL,
+            tags text NOT NULL,
             created_at timestamp NOT NULL,
-            PRIMARY KEY id (id)
+            PRIMARY KEY id (id),
+            UNIQUE KEY tag (session_id)
         ) $charset_collate;";
     
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -55,17 +58,10 @@ class AatopInit
     {
         $table_session = $wpdb->prefix . 'aatop_session';
         $sql_visitor ="DROP TABLE IF EXISTS $sql_visitor";
-        $wpdb->query($table_session);
+        $wpdb->query($sql_visitor);
         $table_visitors = $wpdb->prefix . 'aatop_visitors';
-        $sql_visitor ="DROP TABLE IF EXISTS $sql_visitor";
-        $wpdb->query($table_visitors);
-        // require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        // if ($wpdb->get_var("SHOW TABLES LIKE '$table_session'")  $table_session) {
-        //     dbDelta($sql_visitor);
-        // }
-        // if ($wpdb->get_var("SHOW TABLES LIKE '$sql_session'") == $sql_session) {
-        //     dbDelta($sql_session);
-        // }
+        $sql_visitor ="DROP TABLE IF EXISTS $table_visitors";
+        $wpdb->query($sql_visitor);
     }
     
     public static function add_aatop_admin_menu()
@@ -87,8 +83,8 @@ class AatopInit
         $function_posts = 'aatop_admin_menu_post_html';
         $function_visitors = 'aatop_admin_menu_visitors_html';
         add_menu_page($page_title, $top_menu, $capability, $menu_slug, $function, $icon_url, $position);
-        add_submenu_page($menu_slug,$page_title,$sub_menu_posts,$capability,$menu_slug_posts,$function_posts);
-        add_submenu_page($menu_slug,$page_title,$sub_menu_visitors,$capability,$menu_slug_visitors,$function_visitors);
+        // add_submenu_page($menu_slug,$page_title,$sub_menu_posts,$capability,$menu_slug_posts,$function_posts);
+        // add_submenu_page($menu_slug,$page_title,$sub_menu_visitors,$capability,$menu_slug_visitors,$function_visitors);
     }
 
 }
